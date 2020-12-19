@@ -10,7 +10,7 @@ class LoginPage extends Component {
         username: null,
         password: null,
         error: null,
-    }    
+    }
 
     onChange = event => {
         const { name, value } = event.target;
@@ -27,9 +27,12 @@ class LoginPage extends Component {
             username,
             password
         }
+        const { push } = this.props.history;
+
         this.setState({ error: null })
         try {
             await login(creds);
+            push("/");
         } catch (apiError) {
             this.setState({ error: apiError.response.data.message })
         }
@@ -50,11 +53,11 @@ class LoginPage extends Component {
                         {error}
                     </div>}
                     <div className="text-center">
-                        <ButtonWithProgress 
-                            onClick={this.onClickLogin} 
+                        <ButtonWithProgress
+                            onClick={this.onClickLogin}
                             disabled={!buttonEnabled || pendingApiCall}
                             pendingApiCall={pendingApiCall}
-                            text={t('Login')}/>
+                            text={t('Login')} />
                     </div>
 
                 </form>
