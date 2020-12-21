@@ -4,6 +4,8 @@ import Input from '../components/Input'
 import { withTranslation } from 'react-i18next'
 import ButtonWithProgress from '../components/ButtonWithProgress';
 import { withApiProgress } from '../shared/ApiProgress';
+import { connect } from 'react-redux'
+import { signupHandler } from '../redux/authActions';
 
 class UserSignupPage extends Component {
     state = {
@@ -37,6 +39,8 @@ class UserSignupPage extends Component {
     onClickSignup = async event => {
         event.preventDefault();
         const { username, displayName, password } = this.state;
+        const { history, dispatch } = this.props;
+        const { push } = history;
 
         const body = {
             username,
@@ -44,7 +48,8 @@ class UserSignupPage extends Component {
             password
         }
         try {
-            const response = await signup(body);
+            await dispatch(signupHandler(body));
+            push('/');
         } catch (error) {
             if (error.response.data.validationErrors) {
                 this.setState({ errors: error.response.data.validationErrors });
@@ -52,7 +57,7 @@ class UserSignupPage extends Component {
         }
     }
 
-    
+
 
     render() {
         const { t, pendingApiCall } = this.props;
@@ -69,11 +74,11 @@ class UserSignupPage extends Component {
                     <Input name="passwordRepeat" label={t("Password Repeat")} error={passwordRepeat} onChange={this.onChange} type="password" />
 
                     <div className="text-center">
-                    <ButtonWithProgress 
-                            onClick={this.onClickSignup} 
+                        <ButtonWithProgress
+                            onClick={this.onClickSignup}
                             disabled={pendingApiCall || passwordRepeat !== undefined}
                             pendingApiCall={pendingApiCall}
-                            text={t('Sign Up')}/>
+                            text={t('Sign Up')} />
                     </div>
                 </form>
             </div>
@@ -81,6 +86,7 @@ class UserSignupPage extends Component {
     }
 }
 
-const UserSignupPageWithApiProgress = withApiProgress(UserSignupPage, '/api/1.0/users');
-const UserSignupPageWithTranslation = withTranslation()(UserSignupPageWithApiProgress);
-export default UserSignupPageWithTranslation;
+const UserSignupPageWithApiProgressForSignupRequest = withApiProgress(UserSignupPage, '/api/1.0/users');
+const UserSignupPageWithApiProgressForAuthRequest = withApiProgress(UserSignupPageWithApiProgressForSignupRequest, '/api/1.0/auth');
+const UserSignupPageWithTranslation = withTranslation()(UserSignupPageWithApiProgressForAuthRequest);
+export default connect()(UserSignupPageWithTranslation);
