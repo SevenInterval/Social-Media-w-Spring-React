@@ -4,6 +4,7 @@ const HomePage = () => {
     return (
         <div className="container">
             HomePage
+            Kullanıcı listeleme denemesi
         </div>
     );
 };
