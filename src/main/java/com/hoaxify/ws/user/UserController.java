@@ -2,8 +2,8 @@ package com.hoaxify.ws.user;
 
 import javax.validation.Valid;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.hoaxify.ws.shared.Views;
+import com.hoaxify.ws.shared.CurrentUser;
+import com.hoaxify.ws.user.vm.UserVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hoaxify.ws.shared.GenericResponse;
 
-import java.util.List;
-
 @RestController
 public class UserController {
 
     @Autowired
     UserService userService;
+
+
 
     @PostMapping("/api/1.0/users")
     public GenericResponse createUser(@Valid @RequestBody User user) {
@@ -26,9 +26,8 @@ public class UserController {
     }
 
     @GetMapping("/api/1.0/users")
-    @JsonView(Views.Base.class)
-    Page<User> getUsers(Pageable page) {
-        return userService.getUsers(page);
+    Page<UserVM> getUsers(Pageable page, @CurrentUser User user) {
+        return userService.getUsers(page, user).map(UserVM::new);
     }
 
 }
