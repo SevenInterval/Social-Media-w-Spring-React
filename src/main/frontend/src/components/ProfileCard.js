@@ -17,7 +17,7 @@ const ProfileCard = (props) => {
     const [user, setUser] = useState({});
     const [editable, setEditable] = useState(false);
     const [newImage, setNewImage] = useState();
-    const [validationErrors, setValidationErrors] = useState({});    
+    const [validationErrors, setValidationErrors] = useState({});
 
     const { username, displayName, image } = user;
     const { t } = useTranslation();
@@ -40,8 +40,12 @@ const ProfileCard = (props) => {
     }, [inEditMode, displayName]);
 
     useEffect(() => {
-        setValidationErrors(previousValidationErrors =>  ({ ...previousValidationErrors, displayName: undefined }));
+        setValidationErrors(previousValidationErrors => ({ ...previousValidationErrors, displayName: undefined }));
     }, [updatedDisplayName])
+
+    useEffect(() => {
+        setValidationErrors(previousValidationErrors => ({ ...previousValidationErrors, image: undefined }));
+    }, [newImage])
 
 
     const onChangeFile = (event) => {
@@ -73,7 +77,7 @@ const ProfileCard = (props) => {
 
     const pendingApiCall = useApiProgress('put', '/api/1.0/users/' + username);
 
-    const { displayName: displayNameError } = validationErrors;
+    const { displayName: displayNameError, image: imageError } = validationErrors;
 
     return (
         <div className="card text-center">
@@ -94,7 +98,7 @@ const ProfileCard = (props) => {
                 {inEditMode &&
                     <div>
                         <Input label={t("Change Display Name")} defaultValue={displayName} onChange={event => { setUpdatedDisplayName(event.target.value) }} error={displayNameError} />
-                        <input type="file" onChange={onChangeFile} />
+                        <Input type="file" onChange={onChangeFile} error={imageError} />
                         <div>
                             {<ButtonWithProgress
                                 className="btn btn-primary d-inline-flex"
