@@ -55,7 +55,7 @@ const TopBar = (props) => {
                         <span className="nav-link dropdown-toggle"> {displayName}</span>
                     </div>
                     <div className={dropDownClass}>
-                        <Link className="dropdown-item d-flex p-2" to={`/user/${username}`} nClick={() => setMenuVisible(false)}>
+                        <Link className="dropdown-item d-flex p-2" to={`/user/${username}`} onClick={() => setMenuVisible(false)}>
                             <i className="material-icons text-info mr-2">person</i>
                             {t('My Profile')}
                         </Link>
