@@ -1,5 +1,6 @@
 package com.hoaxify.ws.hoax;
 
+import com.hoaxify.ws.file.FileAttachment;
 import com.hoaxify.ws.user.User;
 import lombok.Data;
 
@@ -15,7 +16,6 @@ public class Hoax {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Size(min = 1, max = 1000)
     @Column(length = 1000)
     private String content;
 
@@ -24,4 +24,7 @@ public class Hoax {
 
     @ManyToOne
     private User user;
+
+    @OneToOne(mappedBy = "hoax")
+    private FileAttachment fileAttachment;
 }

@@ -14,6 +14,9 @@ spring:
     active:
     - dev
     - production
+  servlet:
+    multipart:
+      max-file-size: 10MB
 hoaxify:
   upload-path: picture-storage
 ---
