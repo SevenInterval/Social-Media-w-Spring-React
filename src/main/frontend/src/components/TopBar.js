@@ -10,6 +10,8 @@ const TopBar = (props) => {
     const { t } = useTranslation();
     const { username, isLoggedIn, displayName, image } = useSelector(store => ({ isLoggedIn: store.isLoggedIn, username: store.username, displayName: store.displayName, image: store.image }));
     const dispatch = useDispatch();
+    
+    
     const onLogoutSuccess = () => {
         dispatch(logoutSuccess());
     }

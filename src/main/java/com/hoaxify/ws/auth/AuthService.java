@@ -3,17 +3,14 @@ package com.hoaxify.ws.auth;
 import com.hoaxify.ws.user.User;
 import com.hoaxify.ws.user.UserRepository;
 import com.hoaxify.ws.user.vm.UserVM;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -22,9 +19,12 @@ public class AuthService {
 
     PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    TokenRepository tokenRepository;
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.tokenRepository = tokenRepository;
     }
 
     public AuthResponse authenticate(Credentials credentials) {
@@ -38,11 +38,12 @@ public class AuthService {
         }
         UserVM userVM = new UserVM(inDB);
 
-        Date expiresAt = new Date(System.currentTimeMillis() + 10*1000);
-        String token = Jwts.builder().setSubject(""+ inDB.getId())
-                .signWith(SignatureAlgorithm.HS512, "my-app-secret")
-                .setExpiration(expiresAt)
-                .compact();
+        String token = generateRandomToken();
+        Token tokenEntity = new Token();
+        tokenEntity.setToken(token);
+        tokenEntity.setUser(inDB);
+        tokenRepository.save(tokenEntity);
+
         AuthResponse response = new AuthResponse();
         response.setUser(userVM);
         response.setToken(token);
@@ -51,17 +52,18 @@ public class AuthService {
 
     @Transactional
     public UserDetails getUserDetails(String token) {
-        JwtParser parser = Jwts.parser().setSigningKey("my-app-secret");
-        try {
-            parser.parse(token);
-            Claims claims = parser.parseClaimsJws(token).getBody();
-            long userId = new Long(claims.getSubject());
-            User user = userRepository.getOne(userId);
-            User actualUser = (User)((HibernateProxy)user).getHibernateLazyInitializer().getImplementation();
-            return actualUser;
-        } catch (Exception e) {
-            e.printStackTrace();
+        Optional<Token> optionToken = tokenRepository.findById(token);
+        if(!optionToken.isPresent()) {
+            return null;
         }
-        return null;
+        return optionToken.get().getUser();
+    }
+
+    public String generateRandomToken() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
+    public void clearToken(String token) {
+        tokenRepository.deleteById(token);
     }
 }
