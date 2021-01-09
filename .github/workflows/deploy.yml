@@ -28,7 +28,7 @@ jobs:
     - name: copy react to spring static resources
       run: |
         mkdir -p src/main/resources/static
-        cp -a src/main/frontend/build/. src/main/resources/static
+        cp -a src/main/frontend/build/. src/main/resources/static/
         
     - name: Build spring
       run: mvn -B package --file pom.xml
@@ -40,5 +40,5 @@ jobs:
         username: ${{secrets.USERNAME}}
         server: ${{secrets.IP}}
         ssh_private_key: ${{secrets.SSH}}
-        local_path: ./target/ws-0.0.1.SNAPSHOT.jar
-        remote_path: /home/SevenInterval
+        local_path: target/ws-0.0.1.SNAPSHOT.jar
+        remote_path: /home/ridvanozturk94
