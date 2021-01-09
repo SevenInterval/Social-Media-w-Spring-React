@@ -2,9 +2,11 @@ package com.hoaxify.ws.hoax;
 
 import com.hoaxify.ws.file.FileAttachment;
 import com.hoaxify.ws.file.FileAttachmentRepository;
+import com.hoaxify.ws.file.FileService;
 import com.hoaxify.ws.hoax.vm.HoaxSubmitVM;
 import com.hoaxify.ws.user.User;
 import com.hoaxify.ws.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -25,10 +27,13 @@ public class HoaxService {
 
     FileAttachmentRepository fileAttachmentRepository;
 
-    public HoaxService(HoaxRepository hoaxRepository, UserService userService, FileAttachmentRepository fileAttachmentRepository) {
+    FileService fileService;
+
+    public HoaxService(HoaxRepository hoaxRepository, FileAttachmentRepository fileAttachmentRepository, FileService fileService, UserService userService) {
         this.hoaxRepository = hoaxRepository;
-        this.userService = userService;
         this.fileAttachmentRepository = fileAttachmentRepository;
+        this.fileService = fileService;
+        this.userService = userService;
     }
 
     public void save(HoaxSubmitVM hoaxSubmitVM, User user) {
@@ -97,5 +102,14 @@ public class HoaxService {
         return ( root, criteriaQuery, criteriaBuilder) -> {
             return criteriaBuilder.greaterThan(root.get("id"), id);
         };
+    }
+
+    public void delete(long id) {
+        Hoax inDB = hoaxRepository.getOne(id);
+        if(inDB.getFileAttachment() != null) {
+            String fileName = inDB.getFileAttachment().getName();
+            fileService.deleteAttachmentFile(fileName);
+        }
+        hoaxRepository.deleteById(id);
     }
 }

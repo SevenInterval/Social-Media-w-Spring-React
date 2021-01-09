@@ -72,6 +72,13 @@ const HoaxFeed = () => {
         setNewHoaxCount(0);
     }
 
+    const onDeleteHoaxSuccess = id => {
+        setHoaxPage(previousHoaxPage => ({
+            ...previousHoaxPage,
+            content: previousHoaxPage.content.filter(hoax => hoax.id !== id)
+        }))
+    }
+
 
     const { content, last } = hoaxPage;
 
@@ -83,7 +90,7 @@ const HoaxFeed = () => {
         <div>
             {newHoaxCount > 0 && (<div className="alert alert-secondary text-center mb-1" style={{ cursor: loadNewHoaxesProgress ? "not-allowed" : "pointer" }} onClick={loadNewHoaxesProgress ? () => { } : () => loadNewHoaxes()}>{loadNewHoaxesProgress ? <Spinner /> : t("There are new hoaxes")}</div>)}
             {content.map(hoax => {
-                return <HoaxView key={hoax.id} hoax={hoax} />
+                return <HoaxView key={hoax.id} hoax={hoax} onDeleteHoax={onDeleteHoaxSuccess}/>
             })}
             {!last && <div className="alert alert-secondary text-center" style={{ cursor: loadOldHoaxesProgress ? "not-allowed" : "pointer" }} onClick={loadOldHoaxesProgress ? () => { } : loadOldHoaxes}>
                 {loadOldHoaxesProgress ? <Spinner /> : t("Load old hoaxes")}
