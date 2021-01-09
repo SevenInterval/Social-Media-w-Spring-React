@@ -35,7 +35,7 @@ const HoaxFeed = () => {
             const response = await getNewHoaxCount(firstHoaxId, username);
             setNewHoaxCount(response.data.count);
         }
-        let looper = setInterval(getCount, 1000);
+        let looper = setInterval(getCount, 3*60*1000);
         return function cleanup() {
             clearInterval(looper);
         }
